@@ -5,30 +5,51 @@ This guide provides detailed steps to ensure your PostgreSQL database is running
 ---
 
 ## **1. Start PostgreSQL Service**
+
 Before running your Django application, ensure PostgreSQL is up and running.
 
 ### **For Windows:**
-1. Open **PowerShell as Administrator**
-2. Run the following command to restart PostgreSQL:
+
+1. **Open PowerShell as Administrator**
+2. **Start PostgreSQL Service**  
+   Run the following command to start the PostgreSQL service:
    ```powershell
-   net stop postgresql-x64-17
    net start postgresql-x64-17
    ```
-3. Verify that PostgreSQL is listening on the correct port:
-   ```powershell
-   netstat -ano | findstr :5433
-   ```
-   - If PostgreSQL is listening, you should see output containing `LISTENING`.
-   - If port **5433** is used instead of **5432**, update your Django `settings.py`.
 
-4. Check the currently running port for PostgreSQL:
+3. **Verify that PostgreSQL is Running**  
+   You can check the status of PostgreSQL by running:
+   ```powershell
+   Get-Service | Where-Object { $_.DisplayName -match "PostgreSQL" }
+   ```
+   If PostgreSQL is running, you should see `Running` in the status column.
+
+4. **Verify PostgreSQL is Listening on the Correct Port**  
+   Run the following command to check if PostgreSQL is listening on port 5433:
    ```powershell
    netstat -abn | Select-String "LISTENING"
    ```
+   Look for an entry like:
+   ```
+   TCP    0.0.0.0:5433           0.0.0.0:0              LISTENING
+   ```
+   - If PostgreSQL is listening on port **5433** instead of **5432**, update your Django `settings.py`.
 
-5. If needed, connect to PostgreSQL via `psql`:
+5. **Manually Connect to PostgreSQL (if needed)**  
    ```powershell
    psql -U postgres -d postgres -h 127.0.0.1 -p 5433
+   ```
+
+---
+
+### **For Automatic Startup After System Restart:**
+
+If you don’t want to manually start PostgreSQL after each system restart, you can set PostgreSQL to start automatically with Windows:
+
+1. **Set PostgreSQL to Auto-Start**  
+   Run the following command to configure PostgreSQL to start automatically after a reboot:
+   ```powershell
+   sc config postgresql-x64-17 start= auto
    ```
 
 ---
@@ -100,10 +121,6 @@ If everything is configured correctly, your Django app should connect to Postgre
 - Ensure PostgreSQL service is running: `Get-Service | Where-Object { $_.DisplayName -match "PostgreSQL" }`
 - Try connecting manually using `psql`: `psql -U postgres -d postgres -h 127.0.0.1 -p 5433`
 - If `netstat -ano | findstr :5433` does not return results, PostgreSQL might not be listening on the correct port.
-- Check the currently running port using:
-  ```powershell
-  netstat -abn | Select-String "LISTENING"
-  ```
 
 ### **Django Database Errors**
 - Ensure the correct database credentials are in `settings.py`.
@@ -114,3 +131,6 @@ If everything is configured correctly, your Django app should connect to Postgre
 
 This guide ensures PostgreSQL is correctly set up and running every time before working on your Django project. 🚀
 
+---
+
+Let me know if you need any more changes!
